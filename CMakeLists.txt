@@ -1,0 +1,2 @@
+add_subdirectory(lib_currencyAF)
+add_subdirectory(test_currencyAF)
