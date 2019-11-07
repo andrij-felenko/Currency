@@ -15,11 +15,10 @@ set (currencyAF_cpp
 
 set (CMAKE_AUTORCC)
 find_package(Qt5Core)
-find_package(Qt5Qml)
-find_package(Qt5Quick)
+find_package(Qt5Network)
 
 add_library(lib_currencyAF SHARED ${currencyAF_h} ${currencyAF_cpp})
 
 set_target_properties(lib_currencyAF PROPERTIES OUTPUT_NAME "currencyAF")
 target_include_directories(lib_currencyAF PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(lib_currencyAF lib_baseAF Qt5::Core)
+target_link_libraries(lib_currencyAF lib_baseAF Qt5::Core Qt5::Network)
