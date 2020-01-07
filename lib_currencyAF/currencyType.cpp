@@ -21,7 +21,7 @@ QString Type::toShort(Enum type)
 QString Type::toShort(QString full)
 {
     for (auto it : instance().m_list)
-        if (it.m_full == full)
+        if (it.m_full == full || it.m_short == full)
             return it.m_short;
     return "NaN";
 }
@@ -42,6 +42,14 @@ QString Type::toFull(QString m_short)
     return "NaN";
 }
 
+Type::Enum Type::toEnum(QString currency)
+{
+    for (auto it : instance().m_list)
+        if (it.m_full == currency || it.m_short == currency)
+            return it.m_enum;
+    return Enum::None;
+}
+
 Type::Enum Type::fromShort(QString currency)
 {
     for (auto it : instance().m_list)
@@ -50,20 +58,20 @@ Type::Enum Type::fromShort(QString currency)
     return Enum::None;
 }
 
-AFlib::Enum::Continent Type::continent(QString name)
+AFlib::Continent Type::continent(QString name)
 {
     for (auto it : instance().m_list)
         if (it.m_full == name || it.m_short == name)
             return it.m_continent;
-    return AFcontinent::None;
+    return AFlib::Continent::None;
 }
 
-AFlib::Enum::Continent Type::continent(Type::Enum type)
+AFlib::Continent Type::continent(Type::Enum type)
 {
     for (auto it : instance().m_list)
         if (it.m_enum == type)
             return it.m_continent;
-    return AFcontinent::None;
+    return AFlib::Continent::None;
 }
 
 QStringList Type::allShort()
@@ -75,7 +83,7 @@ QStringList Type::allShort()
 }
 
 void Type::addAfrica(){
-    AFcontinent cont = AFcontinent::Africa;
+    AFlib::Continent cont = AFlib::Continent::Africa;
     add(Enum::Algerian_Dinar,       "Algerian Dinar",       "DZD", cont);
     add(Enum::Angolan_Kwanza,       "Angolan Kwanza",       "AOA", cont);
     add(Enum::Basotho_Loti,         "Basotho Loti",         "LSL", cont);
@@ -121,7 +129,7 @@ void Type::addAfrica(){
 }
 
 void Type::addEastAsia(){
-    AFcontinent cont = AFcontinent::East_Asia;
+    AFlib::Continent cont = AFlib::Continent::East_Asia;
     add(Enum::Bangladeshi_Taka,  "Bangladeshi Taka",   "BDT", cont);
     add(Enum::Bhutanese_Ngultrum,"Bhutanese Ngultrum", "BTN", cont);
     add(Enum::Bruneian_Dollar,   "Bruneian Dollar",    "BND", cont);
@@ -149,7 +157,7 @@ void Type::addEastAsia(){
 }
 
 void Type::addWestAsia(){
-    AFcontinent cont = AFcontinent::West_Asia;
+    AFlib::Continent cont = AFlib::Continent::West_Asia;
     add(Enum::Afghan_Afghani,      "Afghan Afghani",      "AFN", cont);
     add(Enum::Armenian_Dram,       "Armenian Dram",       "AMD", cont);
     add(Enum::Azerbaijan_Manat,    "Azerbaijan Manat",    "AZN", cont);
@@ -179,7 +187,7 @@ void Type::addWestAsia(){
 
 void Type::addEurope()
 {
-    AFcontinent cont = AFcontinent::Europe;
+    AFlib::Continent cont = AFlib::Continent::Europe;
     add(Enum::Albanian_Lek,              "Albanian Lek",              "ALL", cont);
     add(Enum::Belarusian_Ruble,          "Belarusian Ruble",          "BYR", cont);
     add(Enum::Bosnian_Convertible_Marka, "Bosnian Convertible Marka", "BAM", cont);
@@ -210,7 +218,7 @@ void Type::addEurope()
 
 void Type::addNorthAmerica()
 {
-    AFcontinent cont = AFcontinent::North_America;
+    AFlib::Continent cont = AFlib::Continent::North_America;
     add(Enum::Aruban_or_Dutch_Guilder,   "Aruban or Dutch Guilder",   "AWG", cont);
     add(Enum::Bahamian_Dollar,           "Bahamian Dollar",           "BSD", cont);
     add(Enum::Barbadian_or_Bajan_Dollar, "Barbadian or Bajan Dollar", "BBD", cont);
@@ -237,7 +245,7 @@ void Type::addNorthAmerica()
 
 void Type::addOceania()
 {
-    AFcontinent cont = AFcontinent::Oceania;
+    AFlib::Continent cont = AFlib::Continent::Oceania;
     add(Enum::Australian_Dollar,       "Australian Dollar",       "AUD", cont);
     add(Enum::CFP_Franc,               "CFP Franc",               "XPF", cont);
     add(Enum::Fijian_Dollar,           "Fijian Dollar",           "FJD", cont);
@@ -251,7 +259,7 @@ void Type::addOceania()
 
 void Type::addSouthAmerica()
 {
-    AFcontinent cont = AFcontinent::South_America;
+    AFlib::Continent cont = AFlib::Continent::South_America;
     add(Enum::Argentine_Peso,        "Argentine Peso",        "ARS", cont);
     add(Enum::Bolivian_Boliviano,    "Bolivian Bolíviano",    "BOB", cont);
     add(Enum::Brazilian_Real,        "Brazilian Real",        "BRL", cont);
@@ -284,7 +292,7 @@ Type::Type()
     add(Enum::Silver_Ounce,    "Silver Ounce",    "XAG");
 }
 
-void Type::add(Type::Enum type, QString full, QString short_, AFcontinent continent)
+void Type::add(Type::Enum type, QString full, QString short_, AFlib::Continent continent)
 {
     TypeStruct temp;
     temp.m_enum = type;
