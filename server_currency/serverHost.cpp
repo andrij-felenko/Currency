@@ -8,7 +8,7 @@ using namespace CurrencyAF;
 #define HOUR 60 * 60 * 1000
 
 AFHostServer::AFHostServer(QObject *parent) : QNetworkAccessManager(parent),
-    m_accessKey("?access_key=d1f29be92416adc654f63cd524553d64"),
+    m_accessKey("?access_key=8704c7498e5dd8143220f38d6ea43db5"),
     // 33e9a96e437daadfc69cc9495422bb0b dec 0
     // 6b9823a710368c32401bc9515833dbab dec 0
     // 23b9da795607bc2ee760d46a38b61bf7 dec 0
@@ -24,7 +24,7 @@ AFHostServer::AFHostServer(QObject *parent) : QNetworkAccessManager(parent),
     // c9aaa41ff0721a90514a5ac9b4dffae4 dec 0
     // d0e51fcc8d664430d69377bad04beff4 dec 0
     // d067366558778d3522528d90ce2e483d dec 0
-    // 8704c7498e5dd8143220f38d6ea43db5 dec 0
+    // 8704c7498e5dd8143220f38d6ea43db5 dec jan 0
     // d1f29be92416adc654f63cd524553d64 dec jan 0
     // 8ade05ca2d164730c6e69973e46c98e3 dec jan 0
     // 3932546593b313897b1677411570ccb3 dec jan 0

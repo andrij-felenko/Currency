@@ -22,6 +22,7 @@ ByDate::ByDate(QObject* parent) : QObject(parent),
     m_dir = AFlib::Dir(this).pluginData(pluginName);
 
     load();
+    save(FileType::JsonAll);
 //    m_latestDateTime = QDateTime::currentDateTime();// (QDate(1998, 1, 1), QTime(0, 0));
 
     m_server = new QNetworkAccessManager(this);
