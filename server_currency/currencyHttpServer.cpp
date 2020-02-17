@@ -1,6 +1,6 @@
 #include "currencyHttpServer.h"
 #include "lib_currencyAF/currencyData.h"
-#include "lib_baseAF/function.h"
+#include "lib_baseAF/afFunction.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDataStream>

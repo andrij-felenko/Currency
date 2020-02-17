@@ -1,5 +1,5 @@
 #include "currencyByDate.h"
-#include "lib_baseAF/dir.h"
+#include "lib_baseAF/afDir.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QDataStream>

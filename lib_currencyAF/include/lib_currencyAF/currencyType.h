@@ -3,7 +3,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QString>
-#include "lib_baseAF/enumAF.h"
+#include "lib_baseAF/afEnum.h"
 
 namespace CurrencyAF { class Type; }
 
