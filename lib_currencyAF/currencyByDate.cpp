@@ -516,7 +516,7 @@ void ByDate::timeOut()
 
 void ByDate::onRead(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError){
+    if (reply->networkError() != QNetworkReply::NoError){
         qDebug() << "Request has error" << reply->errorString() << reply->url();
         reply->deleteLater();
         return;
