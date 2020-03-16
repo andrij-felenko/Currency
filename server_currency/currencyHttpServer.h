@@ -3,7 +3,7 @@
 
 #include <QtCore/QByteArray>
 #include "serverHost.h"
-#include "qhttpserver.h"
+#include <QtHttpServer/QHttpServer>
 
 class CurrencyHttpServer final : public QObject
 {

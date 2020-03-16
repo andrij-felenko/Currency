@@ -1,5 +1,5 @@
 #include "currencyByDate.h"
-#include "lib_baseAF/afDir.h"
+#include <AFbase/AfDir>
 
 #include <QtCore/QDebug>
 #include <QtCore/QDataStream>
@@ -461,7 +461,7 @@ void ByDate::getServerLatest()
         return;
 
     QNetworkRequest request;
-    request.setUrl(QUrl::fromUserInput(serverLink + "/latest"));
+    request.setUrl(getServerLink(RequestType::Latest));
     m_server->get(request);
 }
 
@@ -486,7 +486,7 @@ void ByDate::getServerCurrencies(QStringList currencies)
     request.setRawHeader("Content-Type", "octet-stream;");
     request.setRawHeader("Content-Length", QByteArray::number(data.size()));
 
-    request.setUrl(QUrl::fromUserInput(serverLink + "/currency"));
+    request.setUrl(getServerLink(RequestType::Currency));
     m_server->post(request, data);
 }
 
@@ -502,7 +502,7 @@ void ByDate::getServerUpdate(QDate last, QStringList currencies)
     QNetworkRequest request;
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/octet-stream;");
     request.setHeader(QNetworkRequest::ContentLengthHeader, data.size());
-    request.setUrl(QUrl::fromUserInput(serverLink + "/update"));
+    request.setUrl(getServerLink(RequestType::Update));
     m_server->post(request, data);
     qDebug() << data;
 }
@@ -633,3 +633,22 @@ QDataStream &operator >> (QDataStream &d, RequestType &type)
     type = static_cast <RequestType> (retShort);
     return d;
 }
+
+QUrl getServerLink(const RequestType type)
+{
+    QString key = ByDate::serverLink;
+    key.append(getServerKey(type));
+    return QUrl::fromUserInput(key);
+}
+
+QString getServerKey(const RequestType type)
+{
+    QString key = "/";
+    switch (type) {
+    case RequestType::Latest:   key += "latest";
+    case RequestType::Update:   key += "update";
+    case RequestType::Currency: key += "currency";
+    }
+    return key;
+}
+

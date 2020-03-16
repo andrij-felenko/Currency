@@ -1,5 +1,5 @@
 #include <QtCore/QCoreApplication>
-#include "lib_currencyAF/currencyByDate.h"
+#include <AFcurrency/AfCurrencyByDate>
 #include <QtCore>
 
 int main(int argc, char** argv)

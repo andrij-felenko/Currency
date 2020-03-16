@@ -1,5 +1,5 @@
 #include <QtCore/QCoreApplication>
-#include "lib_currencyAF/currencyData.h"
+#include <AFcurrency/AfCurrencyData>
 
 #include "currencyHttpServer.h"
 

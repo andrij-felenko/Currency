@@ -1,6 +1,6 @@
 #include "serverHost.h"
-#include "lib_currencyAF/currencyType.h"
-#include "lib_currencyAF/currencyData.h"
+#include <AFcurrency/AfCurrencyType>
+#include <AFcurrency/AfCurrencyData>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 

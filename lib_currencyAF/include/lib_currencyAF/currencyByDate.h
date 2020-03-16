@@ -18,10 +18,12 @@ namespace CurrencyAF {
     typedef QSharedPointer <ByDate> ByDatePtr;
 
     enum class RequestType {
-        Latest,
+        Latest = 0xCE8000,
         Update,
         Currency,
     };
+    QString getServerKey(const RequestType type);
+    QUrl getServerLink(const RequestType type);
 
     struct ValueSingle {
         Type::Enum m_currency;

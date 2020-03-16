@@ -1,6 +1,6 @@
 #include "currencyHttpServer.h"
-#include "lib_currencyAF/currencyData.h"
-#include "lib_baseAF/afFunction.h"
+#include <AFcurrency/AfCurrencyData>
+#include <AFbase/AfFunction>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDataStream>
@@ -20,10 +20,9 @@ CurrencyHttpServer::CurrencyHttpServer(QObject *parent) : QObject(parent)
 
 void CurrencyHttpServer::init()
 {
-    m_server->route("/currency", &CurrencyHttpServer::currency);
-    m_server->route("/latest", &CurrencyHttpServer::latest);
-    m_server->route("/update", &CurrencyHttpServer::update);
-    m_server->route("/update/", &CurrencyHttpServer::update);
+    m_server->route(getServerKey(RequestType::Currency), &CurrencyHttpServer::currency);
+    m_server->route(getServerKey(RequestType::Latest),   &CurrencyHttpServer::latest);
+    m_server->route(getServerKey(RequestType::Update),   &CurrencyHttpServer::update);
 }
 
 int CurrencyHttpServer::listen(const QHostAddress &address, quint16 port)
