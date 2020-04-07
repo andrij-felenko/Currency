@@ -38,6 +38,7 @@ namespace CurrencyAF {
         QList <DateValueSingle> m_list;
         ushort m_year;
         ushort m_month;
+        QString dateStr() const;
     };
 
     enum class FileType {
@@ -45,6 +46,7 @@ namespace CurrencyAF {
         ByteAll,
         JsonAll,
         AsAll,
+        Latest,
     };
 }
 
@@ -107,9 +109,7 @@ private:
     QStringList m_currencyList;
     QList <DateValue> m_list;
     QList <ValueSingle> m_latest;
-    
-    QDir m_dir;
-    QString m_fileName;
+
     QString date_format;
 
     // server private

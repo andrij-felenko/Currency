@@ -1,5 +1,6 @@
 #include <QtCore/QCoreApplication>
 #include <AFcurrency/AfCurrencyData>
+#include <AFbase/AfDir>
 
 #include "currencyHttpServer.h"
 
@@ -16,8 +17,9 @@ int main(int argc, char** argv)
             break;
         }
 
+    AFlib::afDir()->cpDirectory(":/data", AFlib::afDir()->storage().path() + "/currency");
+
     CurrencyAF::ByDate::ignoreUpdater = true;
-    CurrencyAF::Data::setPluginName("Server_currency");
     CurrencyAF::Data::addCurrency(CurrencyAF::Type::allShort());
 
     CurrencyHttpServer server(&app);

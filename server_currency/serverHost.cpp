@@ -8,7 +8,7 @@ using namespace CurrencyAF;
 #define HOUR 60 * 60 * 1000
 
 AFHostServer::AFHostServer(QObject *parent) : QNetworkAccessManager(parent),
-    m_accessKey("?access_key=d067366558778d3522528d90ce2e483d"),
+    m_accessKey("?access_key=496299ab5db8dc64e2c8f42bcff5d896"),
     // 33e9a96e437daadfc69cc9495422bb0b dec 0
     // 6b9823a710368c32401bc9515833dbab dec 0
     // 23b9da795607bc2ee760d46a38b61bf7 dec 0
@@ -23,8 +23,8 @@ AFHostServer::AFHostServer(QObject *parent) : QNetworkAccessManager(parent),
     // 57c0244a940aeb655c1f526298f56bb1 dec 0
     // c9aaa41ff0721a90514a5ac9b4dffae4 dec 0
     // d0e51fcc8d664430d69377bad04beff4 dec 0
-    // d067366558778d3522528d90ce2e483d dec feb 0
-    // 8704c7498e5dd8143220f38d6ea43db5 dec feb 0
+    // d067366558778d3522528d90ce2e483d dec feb apr 0
+    // 8704c7498e5dd8143220f38d6ea43db5 dec feb apr 0
     // d1f29be92416adc654f63cd524553d64 dec jan 0
     // 8ade05ca2d164730c6e69973e46c98e3 dec jan 0
     // 3932546593b313897b1677411570ccb3 dec jan 0
@@ -81,6 +81,7 @@ void AFHostServer::updateDate(const QDate &date)
 void AFHostServer::onRead(QNetworkReply *reply)
 {
     QJsonObject obj = QJsonDocument::fromJson(reply->readAll()).object();
+    qDebug() << obj;
     if (not obj.value("success").toBool()){
         qWarning() << "Success false";
         reply->deleteLater();
@@ -106,7 +107,8 @@ void AFHostServer::onRead(QNetworkReply *reply)
     qDebug() << "Current last " << actualRequest << " request.";
     actualRequest--;
     if (actualRequest == 0){
-        Data::save();
+        Data::save(FileType::ByteAll);
+        Data::save(FileType::ByteMonthly);
         qDebug() << "ALL END.";
     }
     reply->deleteLater();

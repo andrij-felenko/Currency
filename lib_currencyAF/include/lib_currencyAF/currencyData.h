@@ -12,14 +12,12 @@ namespace CurrencyAF { class Data; }
 class CurrencyAF::Data
 {
 public:
-    static void setPluginName(QString name);
-
 //    static QJsonObject collectCurrency(QString name);
 //    static QJsonArray collectCurrency(QStringList names);
 //    static QJsonObject collectLatest();
 //    static std::optional <double> get(QString name, QDate date = QDate::currentDate());
 
-    static void save();
+    static void save(FileType type);
     static void saveAsJson();
     static void add(QDate date, QString m_short, double m_value);
     static void updateLatest(QJsonObject data, QDateTime dTime = QDateTime::currentDateTime());

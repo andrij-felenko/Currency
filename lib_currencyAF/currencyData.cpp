@@ -4,14 +4,9 @@
 
 using namespace CurrencyAF;
 
-void CurrencyAF::Data::setPluginName(QString name)
+void Data::save(FileType type)
 {
-    ByDate::pluginName = name;
-}
-
-void Data::save()
-{
-    inst()->save();
+    inst()->save(type);
 }
 
 void Data::saveAsJson()

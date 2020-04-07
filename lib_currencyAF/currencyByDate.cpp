@@ -1,5 +1,7 @@
 #include "currencyByDate.h"
 #include <AFbase/AfDir>
+#include <AFbase/AfFile>
+#include <AFbase/AfEnum>
 
 #include <QtCore/QDebug>
 #include <QtCore/QDataStream>
@@ -13,16 +15,25 @@ using namespace CurrencyAF;
 bool ByDate::ignoreUpdater = false;
 QString ByDate::pluginName = "Currency";
 QString ByDate::serverLink = QString("127.0.0.1:55555");
-#define HOUR 60 * 60 * 1000
+
+uint _hour = 60 * 60 * 1000;
+QString _all_data = "all_file";
+QString _by_month = "by_month";
+QString _currency = "currency";
+QString _all_currency = "all_currency";
+QString _latest = "latest";
 
 ByDate::ByDate(QObject* parent) : QObject(parent),
-    m_fileName("currencyByDate"), date_format("yyyy-MM-dd")
+    date_format("yyyy-MM-dd")
 {
     clear();
-    m_dir = AFlib::Dir(this).pluginData(pluginName);
 
-    load();
-    save(FileType::JsonAll);
+    if (ignoreUpdater)
+        load(FileType::ByteMonthly);
+    if (m_list.isEmpty() || not ignoreUpdater)
+        load();
+    save(FileType::ByteMonthly);
+    save(FileType::ByteAll);
 //    m_latestDateTime = QDateTime::currentDateTime();// (QDate(1998, 1, 1), QTime(0, 0));
 
     m_server = new QNetworkAccessManager(this);
@@ -37,15 +48,15 @@ ByDate::ByDate(QObject* parent) : QObject(parent),
 
     if (not ignoreUpdater) {
         m_timer = new QTimer(this);
-        m_timer->setInterval(HOUR);
+        m_timer->setInterval(_hour);
 
         // if last update was more than 1 hour before, send it now
-        if (m_latestDateTime.secsTo(QDateTime::currentDateTime()) >= HOUR)
+        if (m_latestDateTime.secsTo(QDateTime::currentDateTime()) >= _hour)
             getServerLatest();
         if (latestDate() != QDate::currentDate().addDays(-1))
             getServerUpdate(latestDate(), m_currencyList);
 
-        QDateTime nearDTime = QDateTime::currentDateTime().addMSecs(HOUR);
+        QDateTime nearDTime = QDateTime::currentDateTime().addMSecs(_hour);
         nearDTime.time().setHMS(nearDTime.time().hour(), 0, 15);
         QTimer::singleShot(QDateTime::currentDateTime().secsTo(nearDTime), m_timer, static_cast<void (QTimer::*)()>(&QTimer::start));
     }
@@ -209,18 +220,15 @@ void ByDate::load(FileType type)
     qDebug() << "Begin load:" << QDateTime::currentDateTime();
     switch (type){
     case FileType::ByteAll: {
-        QFile file(m_dir.absoluteFilePath(m_fileName + ".afdata"));
-        qDebug() << file.fileName();
-        if (file.open(QIODevice::ReadOnly)){
-            QDataStream stream(&file);
-            stream >> m_latestDateTime >> m_latest >> m_list >> m_currencyList;
-            file.close();
-        }
+        AFfile file(QStringList { _currency, _all_data, _all_currency }, AFlib::FileType::Data);
+        qDebug() << file.dPath() << file.dType();
+        if (file.openRead())
+            file >> m_latestDateTime >> m_latest >> m_list >> m_currencyList;
         break;
     }
     case FileType::JsonAll: {
-        QFile file(m_dir.absoluteFilePath(m_fileName + ".json"));
-        if (file.open(QIODevice::ReadOnly)) {
+        AFfile file(QStringList { _currency, _all_data, _all_currency }, AFlib::FileType::Json);
+        if (file.openRead()) {
             QJsonObject byte = QJsonDocument::fromJson(file.readAll()).object();
             QJsonObject latest = byte.value("latest").toObject();
             updateLatest(latest.value("currencies").toObject(),
@@ -239,46 +247,40 @@ void ByDate::load(FileType type)
                 for (auto sub = subObj.begin(); sub != subObj.end(); ++sub)
                     add(QDate::fromString(sub.key(), date_format), currency, sub.value().toDouble());
             }
-            file.close();
             m_currencyList.removeDuplicates();
         }
-        else
-            qDebug() << "File can`t read" << m_fileName;
         break;
     }
     case FileType::ByteMonthly: {
-        QStringList fileList = m_dir.entryList({"*.afd"});
+        QStringList fileList = AFfile::getFullDir(QStringList { _currency, _by_month }, false).entryList({"*.afd"});
         for (auto it : fileList){
-            if (it == "currencyByDate.afd")
-                continue;
             QString fileName = it.left(it.length() - 4);
-            QFile file(m_dir.absoluteFilePath(it));
-            if (not file.open(QIODevice::ReadOnly)){
-                qDebug() << "Can`t open file:" << it << file.errorString();
+            AFfile file(QStringList { _currency, _by_month, fileName }, AFlib::FileType::Data);
+            if (not file.openRead())
                 continue;
-            }
-            QDataStream stream(&file);
-
-            if (it.right(6) == "latest"){
-                QList <DateValue> tmp;
-                stream >> tmp >> m_latest >> m_currencyList;
-                m_list += tmp;
-                file.close();
-                continue;
-            }
 
             // add to m_list
             QList <DateValueSingle> tmp;
             ushort date;
-            stream >> tmp >> date;
+            file >> tmp >> date;
             DateValue single;
             qDebug() << "date load:" << date;
             single.m_list = tmp;
             single.m_year = date / 12;
             single.m_month = date % 12 + 1;
             m_list.push_back(single);
-            file.close();
         }
+        load(FileType::Latest);
+        break;
+    }
+    case FileType::Latest: {
+        AFfile file(QStringList { _currency, _latest }, AFlib::FileType::Data);
+        if (not file.openRead())
+            break;
+
+        QList <DateValue> tmp;
+        file >> tmp >> m_latest >> m_currencyList;
+        m_list += tmp;
         break;
     }
     case FileType::AsAll: {
@@ -296,30 +298,24 @@ void ByDate::save(FileType type)
     qDebug() << "Begin save:" << QDateTime::currentDateTime();
     switch (type) {
     case FileType::ByteAll: {
-        QFile file(m_dir.absoluteFilePath(m_fileName + ".afdata"));
-        if (file.open(QIODevice::Truncate | QIODevice::ReadWrite)){
-            QDataStream stream(&file);
-            stream << m_latestDateTime << m_latest << m_list << m_currencyList;
-            file.close();
-        }
+        AFfile file(QStringList { _currency, _all_data, _all_currency }, AFlib::FileType::Data);
+        if (file.openWrite())
+            file << m_latestDateTime << m_latest << m_list << m_currencyList;
         break;
     }
     case FileType::JsonAll: {
         qDebug() << "Json save start";
         QTime time = QTime::currentTime();
-        QFile file(m_dir.absoluteFilePath(m_fileName + ".json"));
-        if (file.open(QIODevice::Truncate | QIODevice::ReadWrite)){
+        AFfile file(QStringList { _currency, _all_data, _all_currency }, AFlib::FileType::Json);
+        if (file.openWrite()){
             QJsonObject obj;
             obj.insert("latest", collectLatest());
             obj.insert("data", collectJsonCurrency(m_currencyList));
             qDebug() << "data.list" << obj.value("data").toArray().count()
                      << m_list.length() << m_currencyList.length();
             obj.insert("list", QJsonArray::fromStringList(m_currencyList));
-            file.write(QJsonDocument(obj).toJson());
-            file.close();
+            file.writeAll(QJsonDocument(obj).toJson());
         }
-        else
-            qDebug() << "File can`t create" << file.fileName();
 
         qDebug() << "Time to JSON save:" << time.msecsTo(QTime::currentTime()) << "msec";
         break;
@@ -330,30 +326,31 @@ void ByDate::save(FileType type)
         QList <DateValue> m_latestList;
         for (auto it : m_list){
             if (it.m_month == QDate::currentDate().month())
+                if (it.m_year == QDate::currentDate().year())
+                    continue;
+
+            AFfile file(QStringList { _currency, _by_month, it.dateStr() }, AFlib::FileType::Data);
+            if (file.openWrite()){
+                qDebug() << "date" << it.m_year * 12 + it.m_month - 1;
+                file << it.m_list << ushort(it.m_year * 12 + it.m_month - 1);
+            }
+        }
+        save(FileType::Latest);
+        qDebug() << "Time to save:" << time.msecsTo(QTime::currentTime()) << "msec";
+        break;
+    }
+    case FileType::Latest: {
+        QList <DateValue> m_latestList;
+        for (auto it : m_list){
+            if (it.m_month == QDate::currentDate().month())
                 if (it.m_year == QDate::currentDate().year()){
                     m_latestList.push_back(it);
                     continue;
                 }
-
-            QString fileName = QString("_%1_%2.afd").arg(QString::number(it.m_year))
-                                   .arg(QString::number(it.m_month));
-            QFile file(m_dir.absoluteFilePath(m_fileName + fileName));
-            if (file.open(QIODevice::Truncate | QIODevice::ReadWrite)){
-                QDataStream stream(&file);
-                qDebug() << "date" << it.m_year * 12 + it.m_month - 1;
-                stream << it.m_list << ushort(it.m_year * 12 + it.m_month - 1);
-                file.close();
-            }
         }
-
-        // latest list
-        QFile file(m_dir.absoluteFilePath(m_fileName + "_latest.afd"));
-        if (file.open(QIODevice::Truncate | QIODevice::ReadWrite)){
-            QDataStream stream(&file);
-            stream << m_latestList << m_latest << m_currencyList;
-            file.close();
-        }
-        qDebug() << "Time to save:" << time.msecsTo(QTime::currentTime()) << "msec";
+        AFfile file(QStringList { _currency, _latest }, AFlib::FileType::Data);
+        if (file.openWrite())
+            file << m_latestList << m_latest << m_currencyList;
         break;
     }
     case FileType::AsAll: {
@@ -516,7 +513,7 @@ void ByDate::timeOut()
 
 void ByDate::onRead(QNetworkReply *reply)
 {
-    if (reply->networkError() != QNetworkReply::NoError){
+    if (reply->error() != QNetworkReply::NoError){
         qDebug() << "Request has error" << reply->errorString() << reply->url();
         reply->deleteLater();
         return;
@@ -634,14 +631,14 @@ QDataStream &operator >> (QDataStream &d, RequestType &type)
     return d;
 }
 
-QUrl getServerLink(const RequestType type)
+QUrl CurrencyAF::getServerLink(const RequestType type)
 {
     QString key = ByDate::serverLink;
     key.append(getServerKey(type));
     return QUrl::fromUserInput(key);
 }
 
-QString getServerKey(const RequestType type)
+QString CurrencyAF::getServerKey(const RequestType type)
 {
     QString key = "/";
     switch (type) {
@@ -652,3 +649,13 @@ QString getServerKey(const RequestType type)
     return key;
 }
 
+
+QString DateValue::dateStr() const
+{
+    QString ret = QString::number(m_year);
+    ret += "_";
+    if (m_month < 10)
+        ret += "0";
+    ret += QString::number(m_month);
+    return ret;
+}

@@ -5,6 +5,8 @@
 int main(int argc, char** argv)
 {
     QCoreApplication app(argc, argv);
+    app.setOrganizationName("AF");
+    app.setApplicationName("test_currency");
 ////    CurrencyAF::ByDate::instance();
 //    QDateTime local(QDateTime::currentDateTime());
 //    QDateTime UTC(local.toTimeSpec(Qt::UTC));
