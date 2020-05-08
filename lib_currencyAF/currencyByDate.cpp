@@ -2,6 +2,7 @@
 #include <AFbase/AfDir>
 #include <AFbase/AfFile>
 #include <AFbase/AfEnum>
+#include <AFbase/AfServerSettings>
 
 #include <QtCore/QDebug>
 #include <QtCore/QDataStream>
@@ -633,7 +634,7 @@ QDataStream &operator >> (QDataStream &d, RequestType &type)
 
 QUrl CurrencyAF::getServerLink(const RequestType type)
 {
-    QString key = ByDate::serverLink;
+    QString key = afServerSettings()->getUrl(ByDate::pluginName, ByDate::serverLink);
     key.append(getServerKey(type));
     return QUrl::fromUserInput(key);
 }
