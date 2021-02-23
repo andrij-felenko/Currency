@@ -12,7 +12,7 @@ Type &Type::instance()
 
 QString Type::toShort(Enum type)
 {
-    for (auto it : instance().m_list)
+    for (const auto &it : instance().m_list)
         if (it.m_enum == type)
             return it.m_short;
     return "NaN";
@@ -20,7 +20,7 @@ QString Type::toShort(Enum type)
 
 QString Type::toShort(QString full)
 {
-    for (auto it : instance().m_list)
+    for (const auto &it : instance().m_list)
         if (it.m_full == full || it.m_short == full)
             return it.m_short;
     return "NaN";
@@ -28,7 +28,7 @@ QString Type::toShort(QString full)
 
 QString Type::toFull(Type::Enum type)
 {
-    for (auto it : instance().m_list)
+    for (const auto &it : instance().m_list)
         if (it.m_enum == type)
             return it.m_full;
     return "NaN";
@@ -36,7 +36,7 @@ QString Type::toFull(Type::Enum type)
 
 QString Type::toFull(QString m_short)
 {
-    for (auto it : instance().m_list)
+    for (const auto &it : instance().m_list)
         if (it.m_short == m_short)
             return it.m_full;
     return "NaN";
@@ -44,7 +44,7 @@ QString Type::toFull(QString m_short)
 
 Type::Enum Type::toEnum(QString currency)
 {
-    for (auto it : instance().m_list)
+    for (const auto &it : instance().m_list)
         if (it.m_full == currency || it.m_short == currency)
             return it.m_enum;
     return Enum::None;
@@ -52,7 +52,7 @@ Type::Enum Type::toEnum(QString currency)
 
 Type::Enum Type::fromShort(QString currency)
 {
-    for (auto it : instance().m_list)
+    for (const auto &it : instance().m_list)
         if (it.m_short == currency)
             return it.m_enum;
     return Enum::None;
@@ -60,7 +60,7 @@ Type::Enum Type::fromShort(QString currency)
 
 AFlib::Continent Type::continent(QString name)
 {
-    for (auto it : instance().m_list)
+    for (const auto &it : instance().m_list)
         if (it.m_full == name || it.m_short == name)
             return it.m_continent;
     return AFlib::Continent::None;
@@ -68,7 +68,7 @@ AFlib::Continent Type::continent(QString name)
 
 AFlib::Continent Type::continent(Type::Enum type)
 {
-    for (auto it : instance().m_list)
+    for (const auto &it : instance().m_list)
         if (it.m_enum == type)
             return it.m_continent;
     return AFlib::Continent::None;
@@ -77,7 +77,7 @@ AFlib::Continent Type::continent(Type::Enum type)
 QStringList Type::allShort()
 {
     QStringList list;
-    for (auto it : instance().m_list)
+    for (const auto &it : instance().m_list)
         list.push_back(it.m_short);
     return list;
 }

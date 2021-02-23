@@ -52,9 +52,9 @@ QDateTime Data::latestDateTime()
 QList<DateValue> Data::getCurrency(QStringList list)
 {
     QList <DateValue> c_list;
-    for (auto it : inst()->m_list)
+    for (const auto &it : inst()->m_list)
         for (auto sub : it.m_list)
-            for (auto currency : list)
+            for (const auto &currency : list)
                 if (sub.m_currency == Type::toEnum(currency))
                     inst()->add(c_list, QDate(it.m_year, it.m_month, sub.m_day),
                                 sub.m_currency, sub.m_value);
@@ -64,10 +64,10 @@ QList<DateValue> Data::getCurrency(QStringList list)
 QList<DateValue> Data::getUpdate(QDate date, QStringList list)
 {
     QList <DateValue> c_list;
-    for (auto it : inst()->m_list)
+    for (const auto &it : inst()->m_list)
         if (QDate(it.m_year, it.m_month, 1) > date)
             for (auto sub : it.m_list)
-                for (auto currency : list)
+                for (const auto &currency : list)
                     if (sub.m_currency == Type::toEnum(currency))
                         if (QDate(it.m_year, it.m_month, sub.m_day) > date)
                             inst()->add(c_list, QDate(it.m_year, it.m_month, sub.m_day),

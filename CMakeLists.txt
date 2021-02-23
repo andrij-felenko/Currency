@@ -1,3 +1,3 @@
 add_subdirectory(lib_currencyAF)
 add_subdirectory(test_currencyAF)
-add_subdirectory(server_currency)
+#add_subdirectory(server_currency)

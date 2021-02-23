@@ -24,7 +24,7 @@ QString _currency = "currency";
 QString _all_currency = "all_currency";
 QString _latest = "latest";
 
-ByDate::ByDate(QObject* parent) : QObject(parent),
+CurrencyAF::ByDate::ByDate(QObject* parent) : QObject(parent),
     date_format("yyyy-MM-dd")
 {
     clear();
@@ -325,7 +325,7 @@ void ByDate::save(FileType type)
         QTime time = QTime::currentTime();
         // archive list
         QList <DateValue> m_latestList;
-        for (auto it : m_list){
+        for (const auto &it : m_list){
             if (it.m_month == QDate::currentDate().month())
                 if (it.m_year == QDate::currentDate().year())
                     continue;
@@ -421,7 +421,7 @@ QJsonObject ByDate::collectJsonCurrency(QString name)
     obj.insert("currency", name);
 
     QJsonObject data;
-    for (auto it : m_list)
+    for (const auto &it : m_list)
         for (auto sub : it.m_list)
             if (sub.m_currency == Type::toEnum(name))
                 data.insert(QDate(it.m_year, it.m_month, sub.m_day).toString(date_format), sub.m_value);
